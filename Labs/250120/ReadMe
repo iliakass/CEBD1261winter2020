@@ -4,3 +4,183 @@
 // https://docker-curriculum.com/
 
 // Repeating labs steps, and adding instructor provided comments
+
+// install ubuntu, with daemon rights
+docker run -it -d ubuntu
+
+// show the containers' ID and state
+docker ps
+
+// show everything
+docker ps -a
+
+// run withing current terminal a specific container
+docker exec -it container_ID bash
+
+// update container
+:/# apt-get update
+
+// exit container
+:/# exit
+
+// verify that the contain is still running 
+docker ps
+
+// stop the contain from running
+docker stop container_ID 
+docker ps
+
+// show docker images
+docker images
+
+// optional: delete docker images
+docker rmi image_ID
+
+
+// optional: kill the container as a force quite
+docker kill container_ID
+
+// optional: delete the container from system
+docker rm container_ID
+
+//optional: or, instead of Stop and then Delete
+docker rm -f container_ID 
+
+
+// docker_ID is the account ID on ducker hub hub.docker.com
+// run container
+docker exec -it container_ID bash
+
+// obtain all directories in the container, using ll or ls
+:/# ll
+:/# ls
+
+// create app folder
+:/# mkdir app
+:/# ls
+:/# exit
+
+// Optional: remove container but not the image, to see that the folder is removed from container
+docker rm -f container_ID 
+docker run -it -d ubuntu
+docker exex -it container_ID bash
+ls
+
+// commit container_ID under "test" (as a new image_name with the applied changes, different from ubuntu)
+commit container_ID Test
+docker images
+
+// run the new named container, as part of newly name image test
+docker run -it -d test
+docker exec -it container_ID bash
+ls
+
+// delete all containers in the system, images will remain
+docker ps
+docker rm -f $(docker ps -a -q)
+docker ps
+docker images
+
+// run new Ubuntu container
+docker run -it -d ubuntu
+docker exec -it container_ID bash
+:/# apt-get update
+
+//install apache, and authorize use of disk space
+:/# apt-get install apache2
+:/# service apache2 status
+
+//start apache2
+:/# servce apache2 start
+:/# service apache2 status
+:/# exit
+
+// create new image with apache2, which will be bigger than "test" and the original "ubuntu" images
+docker ps
+docker commit container_ID [docker_ID]/apache
+docker ps
+docker images
+
+// run the apache page under a local port
+// -p does port mapping, we can map internal port of the container to the outside host operating system
+docker rm -f $(docker ps -a -q)
+docker run -it -p 82:80 -d [docker_ID]/apache
+
+// to show the page active under the URL localhost:82
+docker ps
+docker exec -it container_ID bash
+:/#service apache2 start
+:/#exit
+
+// to stop showing the apache page
+docker ps
+docker stop container_ID
+
+// access the docker hub, from the terminal, with the docker credentials in use
+docker login
+
+// push the image [docker_ID]/apache to docker hub
+docker push [docker_ID]/apache
+
+// create dockerfile
+mkdir dockerfile
+cd dockerfile
+: nano dockerfile
+
+// File: dockerfile
+FROM ubuntu
+RUN apt-get update
+RUN apt-get -y install apache2
+ADD . /var/www/html
+ENTRYPOINT apachectl -d FOREGROUND
+ENV name CEBD
+
+// ctrl-x to exit, and Save as Y, saved as dockerfile
+
+// create another file. within dockerfile
+: nano 1.html
+
+// File: dockerfile
+<html>
+<title>Hello</title>
+<body>
+<h1>lab for CEBD</h1>
+</body>
+</html>
+
+// building dockerfile, "." represents the current directory
+: docker build . -t new_dockerfile
+
+// see new_dockerfile as an image
+// delete all containers in the system, images will remain
+docker ps
+docker rm -f $(docker ps -a -q)
+docker ps
+docker images
+
+// run the on the local port and show 1.html
+// optional: verify if apache2 is running beforehand
+: docker run -it -p 84:90 -d new_docker_file
+
+
+// to show the page active under the URL localhost:84/1.html
+
+//view inside the container
+docker ps
+docker exec -it container_ID bash
+:/# cd var/www/html
+
+// 1.html, dockerfile, and index.html are shown
+// echo the contents, which will shown the body of 1.html
+: echo $name
+
+// close-out
+: exit
+
+// delete all containers in the system, images will remain
+docker ps
+docker rm -f $(docker ps -a -q)
+docker ps
+
+// show images created following lab: ubuntu, test, [docker_ID]/apache, and new_dockerfile
+docker images
