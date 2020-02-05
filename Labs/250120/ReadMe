@@ -91,7 +91,7 @@ docker exec -it container_ID bash
 :/# service apache2 status
 
 //start apache2
-:/# servce apache2 start
+:/# service apache2 start
 :/# service apache2 status
 :/# exit
 
