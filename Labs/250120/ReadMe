@@ -63,7 +63,7 @@ docker exec -it container_ID bash
 // Optional: remove container but not the image, to see that the folder is removed from container
 docker rm -f container_ID 
 docker run -it -d ubuntu
-docker exex -it container_ID bash
+docker exec -it container_ID bash
 ls
 
 // commit container_ID under "test" (as a new image_name with the applied changes, different from ubuntu)
