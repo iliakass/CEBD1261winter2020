@@ -1,6 +1,9 @@
 
-// Dockerize your app:
+// Exercise : Dockerize your app:
 // Ref: https://runnable.com/docker/python/dockerize-your-python-application
+
+// Docker Hub: https://hub.docker.com/repository/docker/iliakass/dockerize_py_app
+
 
 docker ps
 docker exec -it container_ID bash
