@@ -47,7 +47,7 @@ docker rm container_ID
 docker rm -f container_ID 
 
 
-// docker_ID is the account ID on ducker hub hub.docker.com
+// docker_ID is the account ID on docker hub hub.docker.com
 // run container
 docker exec -it container_ID bash
 
