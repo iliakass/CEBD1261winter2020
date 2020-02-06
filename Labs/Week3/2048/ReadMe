@@ -1,5 +1,7 @@
 // Lab on Feb 1 2020
-// Ref: https://hub.docker.com/_/wordpress/
+// Ref: https://github.com/gabrielecirulli/2048.git
+
+// Docker hub: https://hub.docker.com/repository/docker/iliakass/2048
 
 git clone https://github.com/gabrielecirulli/2048.git
 cd 2048
@@ -27,4 +29,17 @@ docker build -t iliakass/2048 .
 docker images
 docker ps
 
-// to be continued
+docker build -t iliakass/2048 .
+docker images
+docker ps
+
+docker run -it -p 8080:80 -d iliakass/2048
+docker ps -a
+
+docker commit container_ID iliakass/2048 
+docker login 
+docker push iliakass/2048
+
+docker rm -f $(docker ps -a -q) 
+docker images
+cd
