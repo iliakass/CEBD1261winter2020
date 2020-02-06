@@ -1,9 +1,10 @@
-// Recommended reading provided during lab:à
+// Recommended reading provided during lab: 
 // Ref:https://docs.docker.com/engine/reference/commandline/docker/
 // Ref: https://geekflare.com/docker-commands/
 // Ref: https://docker-curriculum.com/
 
 // Repeating labs steps, and adding instructor provided comments
+// Lab on Jan 25 2020
 
 // Docker Hub repos
 // https://hub.docker.com/repository/docker/iliakass/apache
