@@ -4,6 +4,7 @@
 
 // Docker Hub: https://hub.docker.com/repository/docker/iliakass/dockerize_py_app
 
+docker run -it -d python
 
 docker ps
 docker exec -it container_ID bash
