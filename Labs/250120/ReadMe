@@ -1,9 +1,14 @@
 // Recommended reading provided during lab:à
-// https://docs.docker.com/engine/reference/commandline/docker/
-// https://geekflare.com/docker-commands/
-// https://docker-curriculum.com/
+// Ref:https://docs.docker.com/engine/reference/commandline/docker/
+// Ref: https://geekflare.com/docker-commands/
+// Ref: https://docker-curriculum.com/
 
 // Repeating labs steps, and adding instructor provided comments
+
+// Docker Hub repos
+// https://hub.docker.com/repository/docker/iliakass/apache
+// https://hub.docker.com/repository/docker/iliakass/docker_app
+
 
 // install ubuntu, with daemon rights
 docker run -it -d ubuntu
