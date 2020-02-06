@@ -160,7 +160,7 @@ docker images
 
 // run the on the local port and show 1.html
 // optional: verify if apache2 is running beforehand
-: docker run -it -p 84:90 -d new_docker_file
+: docker run -it -p 84:80 -d new_docker_file
 
 
 // to show the page active under the URL localhost:84/1.html
