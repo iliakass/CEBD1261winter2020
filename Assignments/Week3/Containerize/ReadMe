@@ -1,1 +1,47 @@
+// Dockerize your app:
 // Ref: https://www.wintellect.com/containerize-python-app-5-minutes/
+
+// Docker hub: https://hub.docker.com/repository/docker/iliakass/containerize_py_app
+
+mkdir Dockerfile
+cd Dockerfile
+  nano Dockerfile
+    FROM python:alpine3.7
+    COPY . /app
+    WORKDIR /app
+    RUN pip install -r requirements.txt
+    EXPOSE 5000
+    CMD python ./index.py
+
+	// optional: pip install --upgrade pip
+
+	nano index.py
+		from flask import Flask
+    app = Flask(__name__)
+    @app.route("/")
+    def hello():
+    			return "Hello World!"
+    if __name__ == "__main__":
+    			app.run(host="0.0.0.0", port=int("5000"), debug=True)
+
+  nano requirements.txt
+	  flask
+
+docker build --tag iliakass/containerize_py_app .
+
+docker images
+docker ps
+docker login
+docker push iliakass/containerize_py_app
+
+docker run --name python-app -p 5000:5000 iliakass/containerize_py_app
+// access ULR http://0.0.0.0:5000/ provided by docker, which is unsecure
+// or access localhost:5000 to read "Hello World!" in browser
+
+  // * Serving Flask app "index" (lazy loading)
+  // * Environment: production
+  // WARNING: This is a development server. Do not use it in a production deployment.
+  // Use a production WSGI server instead.
+
+
+
