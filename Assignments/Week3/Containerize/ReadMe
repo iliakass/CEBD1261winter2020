@@ -5,27 +5,27 @@
 
 mkdir Dockerfile
 cd Dockerfile
-  nano Dockerfile
-    FROM python:alpine3.7
-    COPY . /app
-    WORKDIR /app
-    RUN pip install -r requirements.txt
-    EXPOSE 5000
-    CMD python ./index.py
+	nano Dockerfile
+		FROM python:alpine3.7
+		COPY . /app
+		WORKDIR /app
+		RUN pip install -r requirements.txt
+		EXPOSE 5000
+		CMD python ./index.py
 
-	// optional: pip install --upgrade pip
+		// optional: pip install --upgrade pip
 
 	nano index.py
 		from flask import Flask
-    app = Flask(__name__)
-    @app.route("/")
-    def hello():
+		app = Flask(__name__)
+		@app.route("/")
+		def hello():
     			return "Hello World!"
-    if __name__ == "__main__":
+		if __name__ == "__main__":
     			app.run(host="0.0.0.0", port=int("5000"), debug=True)
 
-  nano requirements.txt
-	  flask
+  	nano requirements.txt
+	  	flask
 
 docker build --tag iliakass/containerize_py_app .
 
