@@ -14,10 +14,15 @@
 docker pull node
 
 // https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
-
-git clone https://github.com/iliakass/backend-example-docker.git
+cd
+ls
+mkdir backend-example-docker
+ls
 cd backend-example-docker
-  npm install
-  npm start
+ls
+git clone https://github.com/iliakass/backend-example-docker.git
+ls
+touch Dockerfile
+nano Dockerfile
 
 // entering URL http://localhost:8000 yields the message: Port configured correctly, generated message in logs.txt
