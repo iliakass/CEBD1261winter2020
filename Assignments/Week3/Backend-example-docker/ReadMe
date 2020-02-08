@@ -1,3 +1,11 @@
+// Backend-example-docker
+
+// Clone, fork or download a project fromhttps://github.com/docker-hy/backend-example-docker​.
+// Create a Dockerfile for the project and give a command so that the project runs in adocker container with port 8000 exposed 
+// and published so when you start the containerand navigate to ​http://localhost:8000​ y
+// ou will generate a message in logs.txt in the root.
+// Push to your dockerhub and give me the link to your application. Also submit theDockerfile and the command used.
+
 
 // Ref. https://github.com/docker-hy/backend-example-docker
 
