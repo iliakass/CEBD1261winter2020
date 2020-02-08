@@ -6,7 +6,8 @@
 // ou will generate a message in logs.txt in the root.
 // Push to your dockerhub and give me the link to your application. Also submit theDockerfile and the command used.
 
-
 // Ref. https://github.com/docker-hy/backend-example-docker
+// install nodejs for macOs: https://nodejs.org/en/#home-downloadhead
+
 
 // Docker hub:
