@@ -29,6 +29,9 @@ npm install
 docker login
 docker push iliakass/backend-eg-docker
 
+docker rmi iliakass/backend-eg-docker
+docker pull iliakass/backend-eg-docker
+
 
 
 
