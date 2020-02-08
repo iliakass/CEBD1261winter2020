@@ -9,19 +9,29 @@
 // Ref. https://github.com/docker-hy/backend-example-docker
 // install nodejs for macOs: https://nodejs.org/en/#home-downloadhead
 
-// Docker hub:
+// Docker hub: https://hub.docker.com/repository/docker/iliakass/backend-eg-docker
 
-docker pull node
-
-// https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
-cd
-ls
-mkdir backend-example-docker
-ls
-cd backend-example-docker
 ls
 git clone https://github.com/iliakass/backend-example-docker.git
 ls
+cd backend-example-docker
+docker pull node
+docker run -it -d node
+docker ps -a
+docker exec -it [container_ID] bash
+  exit
+docker commit commit [container_ID] iliakass/backend-eg-docker
+docker images
+mkdir app
+cd app
+npm install
+
+docker login
+docker push iliakass/backend-eg-docker
+
+
+
+
 touch Dockerfile
 nano Dockerfile
 docker build -t iliakass/backend-eg-example . 
