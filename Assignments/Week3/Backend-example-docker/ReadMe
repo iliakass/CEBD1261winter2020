@@ -9,8 +9,9 @@
 // Ref. https://github.com/docker-hy/backend-example-docker
 // install nodejs for macOs: https://nodejs.org/en/#home-downloadhead
 
-
 // Docker hub:
+
+docker pull node
 
 git clone https://github.com/iliakass/backend-example-docker.git
 cd backend-example-docker
