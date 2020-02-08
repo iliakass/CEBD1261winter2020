@@ -11,3 +11,10 @@
 
 
 // Docker hub:
+
+git clone https://github.com/iliakass/backend-example-docker.git
+cd backend-example-docker
+  npm install
+  npm start
+
+// entering URL http://localhost:8000 yields the message: Port configured correctly, generated message in logs.txt
