@@ -89,20 +89,34 @@ for (name <- 1 to m) {
 // 2-b) Use the reduce method (Ref: h​ttps://www.geeksforgeeks.org/scala-reduce-function/​)
 // and re-compute the factorial number.
 
-// Main method
-def main(args:Array[String]) {
-
-  // source collection
-  val collection = List(1,2,3,4,5)
+// source collection
+val collection = List(1,2,3,4,5)                  //> collection  : List[Int] = List(1, 2, 3, 4, 5)
   
-  // finding the maximum valued element
-  val res = collection.reduce((x, y) => x max y)
-	println(res)
-  }                                               //> main: (args: Array[String])Unit
+// converting every element to a pair of the form (x,1)
+// 1 is initial frequency of all elements
+val new_collection = collection.map(x => (x,1))   //> new_collection  : List[(Int, Int)] = List((1,1), (2,1), (3,1), (4,1), (5,1)
+                                                  //| )
+
+  
+// adding elements at correspnding positions
+val res = new_collection.reduce( (a,b) => ( a._1 * b._1,
+                                            a._2 + b._2 ) )
+                                                  //> res  : (Int, Int) = (120,5)
+  
+println(res)                                      //> (120,5)
+println("Factorial of 5 = "+ res._1)              //> Factorial of 5 = 120
 
 
 // 2-c) Extend the previous code to generate a list from a number (6 turns into list(1,2,3,4,5,6))
 // then compute the factorial.
+
+// Ref.: https://alvinalexander.com/scala/how-create-scala-list-range-fill-tabulate-constructors
+val k = 6                                         //> k  : Int = 6
+val true_collection = List.range(1, k+1)          //> true_collection  : List[Int] = List(1, 2, 3, 4, 5, 6)
+val res_2 = (true_collection.map(x => (x,1))).reduce((a,b) => ( a._1 * b._1,
+                                            a._2 + b._2 ) )
+                                                  //> res_2  : (Int, Int) = (720,6)
+println("Factorial of " + k + " = " + res_2._1)   //> Factorial of 6 = 720
 
 
 // Exercise 3
