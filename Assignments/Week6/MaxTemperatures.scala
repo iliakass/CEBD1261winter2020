@@ -33,7 +33,7 @@ object MaxTemperatures {
     // Convert to (stationID, entryType, temperature) tuples
     val parsedLines = lines.map(parseLine)
     
-    // Filter out all but TMIN entries
+    // Filter out all but TMax entries
     val maxTemps = parsedLines.filter(x => x._2 == "TMAX")
     
     // Convert to (stationID, temperature)
