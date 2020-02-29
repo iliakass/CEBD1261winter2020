@@ -11,7 +11,7 @@ object MaxTemperatures {
   
   def parseLine(line:String)= {
     val fields = line.split(",")
-    val stationID = fields(0)
+    val stationID = fields(0) 
     val entryType = fields(2)
     val temperature = fields(3).toFloat * 0.1f * (9.0f / 5.0f) + 32.0f
     (stationID, entryType, temperature)
@@ -34,7 +34,7 @@ object MaxTemperatures {
     val parsedLines = lines.map(parseLine)
     
     // Filter out all but TMIN entries
-    val maxTemps = parsedLines.filter(x => x._2 == "TMIN")
+    val maxTemps = parsedLines.filter(x => x._2 == "TMAX")
     
     // Convert to (stationID, temperature)
     val stationTemps = maxTemps.map(x => (x._1, x._3.toFloat))
