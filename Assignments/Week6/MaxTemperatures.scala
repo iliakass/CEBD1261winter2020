@@ -39,7 +39,7 @@ object MaxTemperatures {
     // Convert to (stationID, temperature)
     val stationTemps = maxTemps.map(x => (x._1, x._3.toFloat))
     
-    // Reduce by stationID retaining the minimum temperature found
+    // Reduce by stationID retaining the maximum temperature found
     val maxTempsByStation = stationTemps.reduceByKey( (x,y) => max(x,y))
     
     // Collect, format, and print the results
