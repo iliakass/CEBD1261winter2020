@@ -41,7 +41,7 @@ object MostPopularSuperhero {
     // Load up the superhero co-apperarance data
     val lines = sc.textFile("../SparkContent/Marvel-graph.txt")
     
-    // Convert to (heroID, number of connections) RDD
+    //     Convert to (heroID, number of connections) RDD
     val pairings = lines.map(countCoOccurences)
     
     // Combine entries that span more than one line
@@ -50,16 +50,37 @@ object MostPopularSuperhero {
     // Flip it to # of connections, hero ID
     val flipped = totalFriendsByCharacter.map( x => (x._2, x._1) )
     
+    // Exercise: Super Hero: Print the top 10 superhero as a list.
+    
+    
+    // Find the top 10 of connections
+    val mostPopular = flipped.sortByKey(false).take(10)
+    val res = mostPopular
+    
+    
+    // Print the results, flipping the (count, word) results to word: count as we go.
+    for (result <- res) {
+      val count = result._1
+      val word = namesRdd.lookup(result._2)(0)
+      println(s"$word: $count")
+    }
+    
+   
+    
+    /*
     // Find the max # of connections
-    val mostPopular = flipped.max()
+    val mostPopular = flipped.max
     
     // Look up the name (lookup returns an array of results, so we need to access the first result with (0)).
     val mostPopularName = namesRdd.lookup(mostPopular._2)(0)
     
     // Print out our answer!
     println(s"$mostPopularName is the most popular superhero with ${mostPopular._1} co-appearances.") 
+    */
+    
+    
   }
   
-  // Top 10 ranking
+ 
   
 }
