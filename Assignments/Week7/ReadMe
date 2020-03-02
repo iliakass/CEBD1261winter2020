@@ -1,0 +1,16 @@
+Mandatory Exercises
+● WordCount: Top 10 words excluding “you”, “to”, “your”, “the”, “a”, “of”, “and”
+● Popular Movies: create the top 10 aggregated movies with number of ratings more than
+200.
+● Super Hero: Print the top 10 superhero as a list.
+
+● Healthcare Use Case:
+Recommended doing it via Jupyter Notebook:
+https://towardsdatascience.com/healthcare-dataset-with-spark-6bf48019892b
+
+Bonus Exercise
+● Use case (recommended doing via Jupyter Notebook)
+
+Project-Related Materials
+1. https://spark.apache.org/sql/
+2. http://spark.apache.org/docs/latest/streaming-programming-guide.html
