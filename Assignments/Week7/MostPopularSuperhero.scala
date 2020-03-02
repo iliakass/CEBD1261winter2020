@@ -50,20 +50,31 @@ object MostPopularSuperhero {
     // Flip it to # of connections, hero ID
     val flipped = totalFriendsByCharacter.map( x => (x._2, x._1) )
     
-    // Exercise: Super Hero: Print the top 10 superhero as a list.
     
+    // Exercise: Super Hero: Print the top 10 superheros as a list.
     
     // Find the top 10 of connections
     val mostPopular = flipped.sortByKey(false).take(10)
     val res = mostPopular
     
+    // Create the list
+    // Ref: https://stackoverflow.com/questions/6557169/how-to-declare-empty-list-and-then-add-string-in-scala
+    // Ref: https://alvinalexander.com/scala/how-add-elements-to-a-list-in-scala-listbuffer-immutable
+    var dk = List("PopName",Nil)
     
-    // Print the results, flipping the (count, word) results to word: count as we go.
+    // Print the results, flipping the (PopName, count) results to word: count as we go.
     for (result <- res) {
+      
+      // number of connections
       val count = result._1
-      val word = namesRdd.lookup(result._2)(0)
-      println(s"$word: $count")
+      
+      // Look up the name (lookup returns an array of results, so we need to access the first result with (0)).
+      val PopName = namesRdd.lookup(result._2)(0)
+      
+      //println(s"$PopName: $count")
+      dk = (PopName, count) :: dk
     }
+    println(dk)
     
    
     
