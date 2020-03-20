@@ -6,21 +6,21 @@ import org.apache.log4j._
 import scala.math.min
 import scala.math.max
 
-/** Find the greatest difference between maximum and minimum temperature by weather station */
-object MaxDeltaTemperatures {
+/** Find the date with the greatest range between min and max*/
+object MaxDeltaDateTemp {
   
   def parseLine(line:String) = {
     val fields = line.split(",") // comma separate values
     
-    val stationID = fields(0) // stationID is x._1; 
-    // fields(1) is the date, and it is not used by the parseline
+    //val stationID = fields(0) // stationID was previously x._1; x._1 is now the Date
+    val Date = fields(1) // fields(1) is the date in YYYYMMDD format
     
     val entryType = fields(2) // entryType is x._2 populated by Tmax, Tmin, Precipitation
   
     val temperature = fields(3).toFloat * 0.1f * (9.0f / 5.0f) + 32.0f // temp is x._3
     // values convert Celcius to Farenheit
     
-    (stationID, entryType, temperature) 
+    (Date, entryType, temperature) 
   }
     /** Our main function where the action happens */
   def main(args: Array[String]) {
@@ -75,7 +75,7 @@ object MaxDeltaTemperatures {
     var max_array = Array.ofDim[String](resultsMax_size+1,3) // (rows, cols)
     var min_array = Array.ofDim[String](resultsMin_size+1,3)
     
-    var res_array = Array.ofDim[String](resultsMin_size+1,2) // results of the sum of max and -min array
+    var res_array = Array.ofDim[Any](resultsMin_size+1,2) // results of the sum of max and -min array
     
     var i = 0
     
@@ -127,18 +127,35 @@ object MaxDeltaTemperatures {
    //Show max range between min and max by station
    var a = 0.0
    var b = 0.0
+   var k = 0
    
    for (n <- 0 to j-1) {
       a =  (min_array(n)(2)).toFloat
       b =  (max_array(n)(2)).toFloat
-      val c = a + b 
-      res_array(n)(1) = (c).toString
+      val c = a + b // sum of Max and -Min as Float
+      res_array(n)(1) = (c)
       val d = min_array(n)(1) //+ max_array(n)(1)
-      res_array(n)(0) = d
-      val formattedTemp = f"$c%.2f F"
-      println(s"$d temperature: $formattedTemp") 
+      res_array(n)(0) = d // assignment of date as String
+      //val formattedTemp = f"$c%.2f F"
+      //println(s"$d temperature: $formattedTemp") 
+      
+      var res = Map(d -> c)
+      k += 1
+      
+     // Obtain Max from Array
+     // Ref: https://stackoverflow.com/questions/20285209/find-min-and-max-elements-of-array
+      if(j-1 == k) {
+         var res2 = res.max
         
+           val date = res2._1
+           val temp_1 = res2._2 
+           //val formattedTemp = (f"$temp_1%.2f").toFloat
+           val formattedTemp = f"$temp_1%.2f F"
+           println(s"On $date max temperature range: $formattedTemp") 
+         
+      }
+      
    }
- 
+   
   }
 }
