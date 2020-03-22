@@ -48,7 +48,36 @@ object SparkSQL {
     val teenagers = spark.sql("SELECT * FROM people WHERE age >= 13 AND age <= 19")
     val results = teenagers.collect()
     
-    results.foreach(println)
+    //println(results.getClass) Get class or results variable
+    //res: class [Lorg.apache.spark.sql.Row; // as an WrappedArray[org.apache.spark.sql.Row]
+    
+    //results.foreach(println)
+    //println(results(0)) //ID:Int, name:String, age:Int, numFriends:Int
+    
+    // Convert to dataframe
+    import org.apache.spark.sql.Row
+    import org.apache.spark.sql.types.{StructType, StructField, StringType, IntegerType, ArrayType}
+     
+    //Ref: https://sparkbyexamples.com/spark/spark-explode-nested-array-to-rows/
+    val arraySchema = new StructType()
+    .add("ID",IntegerType)
+    .add("name",StringType)
+    .add("age",IntegerType)
+    .add("numFriends",IntegerType)
+
+    val df = spark.createDataFrame(
+        spark.sparkContext.parallelize(results),arraySchema)
+        
+    df.printSchema()
+    df.show()
+    
+    //Export dataframe to CSV
+    //Ref: https://stackoverflow.com/questions/32527519/how-to-export-dataframe-to-csv-in-scala
+    df.coalesce(1)
+      .write
+      .option("header", "true")
+      .csv("../SparkContent/data.csv")
+    
     spark.stop()
   }
 }
