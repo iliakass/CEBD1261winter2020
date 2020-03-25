@@ -5,6 +5,10 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.sql._
 import org.apache.log4j._
 
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.{StructType, StructField, StringType, LongType, IntegerType, DoubleType}
+       
+
 object ProjectSparkSQL {
   
   case class Iris(
@@ -90,7 +94,7 @@ object ProjectSparkSQL {
       .getOrCreate()
       
     // IRIS file: tableconvert_2020-03-22_225401.csv
-    val lines = spark.sparkContext.textFile("../SparkCourse/SparkContent/tableconvert_2020-03-22_225401.csv")
+    val lines = spark.sparkContext.textFile("../SparkContent/tableconvert_2020-03-22_225401.csv")
     val iris = lines.map(mapper)
     
     // Infer the schema, and register the DataSet as a table.
@@ -122,9 +126,7 @@ object ProjectSparkSQL {
     
    // Convert results to dataframe
         
-      import org.apache.spark.sql.Row
-      import org.apache.spark.sql.types.{StructType, StructField, StringType, LongType, IntegerType, DoubleType}
-       
+      
           //Ref: https://sparkbyexamples.com/spark/spark-explode-nested-array-to-rows/
           val arraySchema = new StructType()
           .add("sepal_length",StringType) //sepal_length
@@ -147,6 +149,7 @@ object ProjectSparkSQL {
                * 
                */
               
+// // Start of Exploratory Analysis and Data Cleaning
               
       // df.show() 
           //res: only showing top 20 rows for dataframe
@@ -182,6 +185,7 @@ object ProjectSparkSQL {
       //println(df_mod.count()) 
         //res: 150 rows with the removed header row for the modified dataframe
       
+      
  // Transfer 4 columns to Double expect Species column
       // Ref: https://stackoverflow.com/questions/29383107/how-to-change-column-types-in-spark-sqls-dataframe
       
@@ -189,7 +193,8 @@ object ProjectSparkSQL {
           df_mod("sepal_length").cast(DoubleType).as("sepal_length"),
           df_mod("sepal_width").cast(DoubleType).as("sepal_width"),
           df_mod("petal_length").cast(DoubleType).as("petal_length"),
-          df_mod("sepal_width").cast(DoubleType).as("sepal_width")
+          df_mod("sepal_width").cast(DoubleType).as("sepal_width"),
+          df_mod("species").cast(StringType).as("species")
       )
       
       //df_copy.printSchema()
@@ -205,25 +210,138 @@ object ProjectSparkSQL {
       //println(df_copy.getClass) 
         //res: class org.apache.spark.sql.Dataset
       
-      df_copy.filter("sepal_length is not null AND sepal_length != ''").show()
-    
-    
-    
-          
-    
-    
       
-    
+// Count number of null or blank entries for 4 attribute columns
+      // Ref: https://stackoverflow.com/questions/41765739/count-the-number-of-non-null-values-in-a-spark-dataframe
+      // df_copy.describe().filter($"summary" === "count").show
+        //res: 
+        /*
+        +-------+------------+-----------+------------+-----------+-------+
+        |summary|sepal_length|sepal_width|petal_length|sepal_width|species|
+        +-------+------------+-----------+------------+-----------+-------+
+        |  count|         150|        150|         150|        150|    150|
+        +-------+------------+-----------+------------+-----------+-------+
+        
+        * 
+        */
+      
+      // df_copy.describe().filter($"summary" === "isNullorBlank").show
+        // res:
+        /*
+        +-------+------------+-----------+------------+-----------+-------+
+        |summary|sepal_length|sepal_width|petal_length|sepal_width|species|
+        +-------+------------+-----------+------------+-----------+-------+
+        +-------+------------+-----------+------------+-----------+-------+
+       	
+       	* 
+       	*/
+      
+      
+ // Count number of null entries for for the species string column
+      // Ref:https://stackoverflow.com/questions/40500732/scala-dataframe-null-check-for-columns
+      // df_copy.filter("species IS null OR species == '' ").show()
+      
+      // Ref: https://stackoverflow.com/questions/44329398/count-empty-values-in-dataframe-column-in-spark-scala
+          /*
+          val df_show = df_copy.filter(
+              df_copy("species").isNull 
+              || df_copy("species") === "" 
+              || df_copy("species").isNaN).count()
+         
+          println(df_show)
+          		// res: 0
+      		 	* 
+      		 	*/
+
+      
+  // // End of Exploratory Analysis and Data Cleaning
+      
     /*
-    
-    
-    //Export dataframe to CSV
+    //Export dataframe to CSV for Analysis with other tools
     //Ref: https://stackoverflow.com/questions/32527519/how-to-export-dataframe-to-csv-in-scala
-    df.coalesce(1)
+    df_copy.coalesce(1)
       .write
       .option("header", "true")
       .csv("../SparkContent/project_data.csv")
+    
+    *
     */
+      
+      
+  // // Start of Classification through ML
+  
+      // Ref: https://spark.apache.org/docs/latest/ml-classification-regression.html#random-forest-classifier
+        // Random forest classifier
+        
+        import org.apache.spark.ml.Pipeline
+        import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
+        import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+        import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
+        
+        // Load DataFrame.
+        val data = df_copy
+          
+        println("worksA")
+        // Index labels, adding metadata to the label column.
+        // Fit on whole dataset to include all labels in index.
+        val labelIndexer = new StringIndexer()
+          .setInputCol("label")
+          .setOutputCol("indexedLabel")
+          .fit(data)
+        println("worksB")
+        // Automatically identify categorical features, and index them.
+        // Set maxCategories so features with > 4 distinct values are treated as continuous.
+        val featureIndexer = new VectorIndexer()
+          .setInputCol("features")
+          .setOutputCol("indexedFeatures")
+          .setMaxCategories(4)
+          .fit(data)
+        println("worksC")
+        // Split the data into training and test sets (30% held out for testing).
+        val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3))
+        println("worksD")
+        // Train a RandomForest model.
+        val rf = new RandomForestClassifier()
+          .setLabelCol("indexedLabel")
+          .setFeaturesCol("indexedFeatures")
+          .setNumTrees(10)
+        println("worksE")
+        // Convert indexed labels back to original labels.
+        val labelConverter = new IndexToString()
+          .setInputCol("prediction")
+          .setOutputCol("predictedLabel")
+          .setLabels(labelIndexer.labels)
+        
+        // Chain indexers and forest in a Pipeline.
+        val pipeline = new Pipeline()
+          .setStages(Array(labelIndexer, featureIndexer, rf, labelConverter))
+        
+        // Train model. This also runs the indexers.
+        val model = pipeline.fit(trainingData)
+        
+        // Make predictions.
+        val predictions = model.transform(testData)
+        
+        // Select example rows to display.
+        predictions.select("predictedLabel", "label", "features").show(5)
+        
+        // Select (prediction, true label) and compute test error.
+        val evaluator = new MulticlassClassificationEvaluator()
+          .setLabelCol("indexedLabel")
+          .setPredictionCol("prediction")
+          .setMetricName("accuracy")
+        val accuracy = evaluator.evaluate(predictions)
+        println(s"Test Error = ${(1.0 - accuracy)}")
+        
+        val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel]
+        println(s"Learned classification forest model:\n ${rfModel.toDebugString}")
+              
+      
+  // // End of Classification through ML
+      
+    
+      
+    
       
     spark.stop()
   }
