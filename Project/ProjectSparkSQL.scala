@@ -1,12 +1,16 @@
 package com.cebd.spark
 
+
+
 import org.apache.spark._
 import org.apache.spark.SparkContext._
 import org.apache.spark.sql._
 import org.apache.log4j._
 
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{StructType, StructField, StringType, LongType, IntegerType, DoubleType}
+import org.apache.spark.sql.types.{
+  StructType, StructField, StringType, LongType, IntegerType, DoubleType
+  }
        
 
 object ProjectSparkSQL {
@@ -85,7 +89,7 @@ object ProjectSparkSQL {
     // Use new SparkSession interface in Spark 2.0
     val spark = SparkSession
       .builder
-      .appName("SparkSQL")
+      .appName("ProjectSparkSQL")
       .config("spark.driver.host", "localhost")
       .master("local[*]")
           // .config("spark.sql.warehouse.dir", "file:///C:/temp") 
@@ -156,7 +160,7 @@ object ProjectSparkSQL {
       
       // Drop the first row since it is a copy of the headers
       // Ref: https://stackoverflow.com/questions/45316810/how-to-delete-the-first-few-rows-in-dataframe-scala-ssark
-      
+          
           val rows = df.rdd.zipWithUniqueId().map {
             case (row, id) => Row.fromSeq(row.toSeq :+ id)
             }
@@ -167,7 +171,7 @@ object ProjectSparkSQL {
     
           df_mod = df_mod
                     .filter($"id" > 0) // remove first header row 0
-                    .drop("id") // drop temporarly create ID column
+                    //.drop("id") // drop temporarly create ID column
       
       //df_mod.show() 
         //res: show first 20 results for modified dataframe
@@ -193,17 +197,19 @@ object ProjectSparkSQL {
           df_mod("sepal_length").cast(DoubleType).as("sepal_length"),
           df_mod("sepal_width").cast(DoubleType).as("sepal_width"),
           df_mod("petal_length").cast(DoubleType).as("petal_length"),
-          df_mod("sepal_width").cast(DoubleType).as("sepal_width"),
-          df_mod("species").cast(StringType).as("species")
+          df_mod("sepal_width").cast(DoubleType).as("petal_width"),
+          df_mod("species").cast(StringType).as("species"),
+          df_mod("id").cast(LongType).as("id")
       )
       
-      //df_copy.printSchema()
+      // df_copy.printSchema()
         //res:
         /*      root
          |-- sepal_length: double (nullable = true)
          |-- sepal_width: double (nullable = true)
          |-- petal_length: double (nullable = true)
          |-- sepal_width: double (nullable = true)
+         |-- id: long (nullable = false)
          * 
          */
       
@@ -216,11 +222,11 @@ object ProjectSparkSQL {
       // df_copy.describe().filter($"summary" === "count").show
         //res: 
         /*
-        +-------+------------+-----------+------------+-----------+-------+
-        |summary|sepal_length|sepal_width|petal_length|sepal_width|species|
-        +-------+------------+-----------+------------+-----------+-------+
-        |  count|         150|        150|         150|        150|    150|
-        +-------+------------+-----------+------------+-----------+-------+
+        +-------+------------+-----------+------------+-----------+-------+---+
+        |summary|sepal_length|sepal_width|petal_length|petal_width|species| id|
+        +-------+------------+-----------+------------+-----------+-------+---+
+        |  count|         150|        150|         150|        150|    150|150|
+        +-------+------------+-----------+------------+-----------+-------+---+
         
         * 
         */
@@ -228,10 +234,10 @@ object ProjectSparkSQL {
       // df_copy.describe().filter($"summary" === "isNullorBlank").show
         // res:
         /*
-        +-------+------------+-----------+------------+-----------+-------+
-        |summary|sepal_length|sepal_width|petal_length|sepal_width|species|
-        +-------+------------+-----------+------------+-----------+-------+
-        +-------+------------+-----------+------------+-----------+-------+
+        +-------+------------+-----------+------------+-----------+-------+---+
+        |summary|sepal_length|sepal_width|petal_length|petal_width|species| id|
+        +-------+------------+-----------+------------+-----------+-------+---+
+        +-------+------------+-----------+------------+-----------+-------+---+
        	
        	* 
        	*/
@@ -256,7 +262,9 @@ object ProjectSparkSQL {
       
   // // End of Exploratory Analysis and Data Cleaning
       
-    /*
+      
+    
+    
     //Export dataframe to CSV for Analysis with other tools
     //Ref: https://stackoverflow.com/questions/32527519/how-to-export-dataframe-to-csv-in-scala
     df_copy.coalesce(1)
@@ -264,80 +272,109 @@ object ProjectSparkSQL {
       .option("header", "true")
       .csv("../SparkContent/project_data.csv")
     
-    *
-    */
+    
       
       
-  // // Start of Classification through ML
+  // // Start of ML
   
-      // Ref: https://spark.apache.org/docs/latest/ml-classification-regression.html#random-forest-classifier
-        // Random forest classifier
-        
+      // Ref: https://scalac.io/scala-spark-ml-machine-learning-introduction/
+        // Regression, direct use of code from Ref in full form
         import org.apache.spark.ml.Pipeline
-        import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
-        import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
-        import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
-        
-        // Load DataFrame.
-        val data = df_copy
-          
-        println("worksA")
-        // Index labels, adding metadata to the label column.
-        // Fit on whole dataset to include all labels in index.
-        val labelIndexer = new StringIndexer()
-          .setInputCol("label")
-          .setOutputCol("indexedLabel")
-          .fit(data)
-        println("worksB")
-        // Automatically identify categorical features, and index them.
-        // Set maxCategories so features with > 4 distinct values are treated as continuous.
-        val featureIndexer = new VectorIndexer()
-          .setInputCol("features")
-          .setOutputCol("indexedFeatures")
-          .setMaxCategories(4)
-          .fit(data)
-        println("worksC")
-        // Split the data into training and test sets (30% held out for testing).
-        val Array(trainingData, testData) = data.randomSplit(Array(0.7, 0.3))
-        println("worksD")
-        // Train a RandomForest model.
-        val rf = new RandomForestClassifier()
-          .setLabelCol("indexedLabel")
-          .setFeaturesCol("indexedFeatures")
-          .setNumTrees(10)
-        println("worksE")
-        // Convert indexed labels back to original labels.
-        val labelConverter = new IndexToString()
-          .setInputCol("prediction")
-          .setOutputCol("predictedLabel")
-          .setLabels(labelIndexer.labels)
-        
-        // Chain indexers and forest in a Pipeline.
-        val pipeline = new Pipeline()
-          .setStages(Array(labelIndexer, featureIndexer, rf, labelConverter))
-        
-        // Train model. This also runs the indexers.
-        val model = pipeline.fit(trainingData)
-        
-        // Make predictions.
-        val predictions = model.transform(testData)
-        
-        // Select example rows to display.
-        predictions.select("predictedLabel", "label", "features").show(5)
-        
-        // Select (prediction, true label) and compute test error.
-        val evaluator = new MulticlassClassificationEvaluator()
-          .setLabelCol("indexedLabel")
-          .setPredictionCol("prediction")
-          .setMetricName("accuracy")
-        val accuracy = evaluator.evaluate(predictions)
-        println(s"Test Error = ${(1.0 - accuracy)}")
-        
-        val rfModel = model.stages(2).asInstanceOf[RandomForestClassificationModel]
-        println(s"Learned classification forest model:\n ${rfModel.toDebugString}")
-              
+        import org.apache.spark.ml.evaluation.RegressionEvaluator
+        import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer, VectorAssembler}
+        import org.apache.spark.ml.regression.GBTRegressor
+        import org.apache.spark.sql.{Encoders, SparkSession}
       
-  // // End of Classification through ML
+        
+        
+        val spark_2 = SparkSession
+            .builder
+            .appName("ProjectSparkSQL")
+            .config("spark.driver.host", "localhost")
+            .master("local[*]")
+            .getOrCreate()
+            
+        // Define schema
+        val schemaStruct = StructType(
+            StructField("sepal_length", DoubleType) ::
+            StructField("sepal_width", DoubleType) ::
+            StructField("petal_length", DoubleType) ::
+            StructField("petal_width", DoubleType) :: 
+            StructField("species", StringType) :: 
+            StructField("id", LongType) ::Nil
+        )
+        
+        
+        //We read the data from the file taking into account there's a header.
+        
+        val df_import = spark_2.read
+            .option("header", true)
+            .schema(schemaStruct)
+            .csv("../SparkContent/project_data.csv")
+            //.na.drop() // not required as there are no null values
+        
+      
+           
+      // Split the df into training 80% and test data 20%
+        val Array(trainingData, testData) = df_import.randomSplit(Array(0.8, 0.2))
+        
+        val labelColumn = "sepal_length"
+        
+      // Define two StringIndexers for the categorical variables
+        val speciesIndexer = new StringIndexer()
+            .setInputCol("species")
+            .setOutputCol("speciesIndex")
+         
+      // Define the assembler to collect the columns into a new column with a single vector - "features"
+        val assembler = new VectorAssembler()
+            .setInputCols(Array("sepal_width","petal_length","petal_width","speciesIndex") )
+            .setOutputCol("features")    
+      
+      // For the regression, use the Gradient-boosted tree estimator
+        val gbt = new GBTRegressor()
+            .setLabelCol(labelColumn)
+            .setFeaturesCol("features")
+            .setPredictionCol("Predicted " + labelColumn)
+            .setMaxIter(50)
+        
+      // Define the Array with the stages of the pipeline
+        val stages = Array(
+            speciesIndexer,
+            assembler,
+            gbt
+        )
+        
+      // Construct the pipeline
+        val pipeline = new Pipeline().setStages(stages)
+      
+      /* Serialization ocurrs below this line, which are not resolved. The Scala code is adapted to work once the error is resolved.
+       * 
+      // Fit our DataFrame into the pipeline to generate a model
+        val model = pipeline.fit(trainingData) 
+       
+      // Make predictions using the model and the test data
+        val predictions = model.transform(testData)
+      
+      // Evaluate the error/deviation of the regression, using the Root Mean Squared (RMS) deviation
+        val evaluator = new RegressionEvaluator()
+            .setLabelCol(labelColumn)
+            .setPredictionCol("Predicted " + labelColumn)
+            .setMetricName("rmse")
+        
+      // Compute the error using the evaluator
+        val error = evaluator.evaluate(predictions)
+        
+        println("RMS: "+ error)
+           
+      
+        
+      // Ref: https://spark.apache.org/docs/latest/ml-classification-regression.html#random-forest-classifier
+        // Random forest classifier for secondary attempt
+        
+        
+              */
+      
+  // // End of ML
       
     
       
